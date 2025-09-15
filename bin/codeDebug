@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+# Change to TSS_DEBUG_BRK to have the TSServer wait in the beginning
+# See https://github.com/microsoft/TypeScript/wiki/Debugging-Language-Service-in-VS-Code
+
+TSS_DEBUG=9449 code "$@"

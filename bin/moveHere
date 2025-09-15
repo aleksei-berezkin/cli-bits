@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+# Moves the files listed in stdin to the current directory
+# Example: `lastDown 2 | moveHere`
+# Moves the last 2 downloaded files into the current directory
+
+while IFS=$'\n' read -r L; do
+  mv "$L" .
+done

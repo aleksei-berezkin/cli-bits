@@ -1,0 +1,19 @@
+#!/usr/bin/env node
+
+import { readInputLines } from '../util/readInputLines.mjs'
+
+/**
+ * In the beginning of each line, outputs its 1-based number and its -1-based number from the end.
+ * Numbers are zero-padded.
+ * 
+ * Example: `ls -al | enum`
+ */
+readInputLines()
+  .forEach((line, index, {length}) =>
+    console.log(` ${padTo(index + 1, length)}  ${padTo(-(length - index), -length)}  ${line}`)
+  )
+
+function padTo(num, max) {
+  const padLength = String(max).length - String(num).length
+  return Array.from({length: padLength}, () => ' ').join('') + num
+}

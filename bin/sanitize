@@ -1,0 +1,33 @@
+#!/usr/bin/env node
+
+/*
+ * Renames the file, changing quotes, spaces and parens to underscores
+ */
+
+import { renameSync } from 'fs'
+
+const fileNames = process.argv.slice(2)
+
+if (!fileNames.length) {
+    console.error('File name is missing')
+    process.exit(1)
+}
+
+const newFileNames = fileNames.map(name =>
+    [...name].map(c => c.charCodeAt(0) <= 32 || c === '"' || c === "'" || c === '(' || c === ')' ? '_' : c).join('')
+)
+
+const unique = new Set(newFileNames)
+if (unique.size !== newFileNames.length) {
+    console.error(`Result file names are not unique: ${newFileNames}`)
+    process.exit(1)
+}
+
+fileNames
+    .forEach((oldName, i) => {
+        const newName = newFileNames[i]
+        if (newName !== oldName) {
+            console.log(`"${oldName}" -> "${newName}"`)
+            renameSync(oldName, newName)
+        }
+    })

@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+# Combination of getLine and less
+# Example:
+# ls -a | lless 3 -SImN
+# Opens the 3rd line in `less` passing `-SImN` options to `less`
+
+N="${1:-1}"
+shift
+getLine "$N" | xargs less "$@"

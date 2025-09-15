@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+# Move files listed in stdin or in args to trash bin
+
+if [ $# -eq 0 ]; then
+  while IFS=$'\n' read -r L; do
+    mv "$L" ~/.Trash
+  done
+else
+  for arg in "$@"
+  do
+    mv "$arg" ~/.Trash
+  done
+fi

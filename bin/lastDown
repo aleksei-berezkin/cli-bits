@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+# lastDown [N]
+# Outputs the last N downloaded files, default 1
+
+N="${1:-1}"
+ls -t ~/Downloads | head -n $N | xargs -I _ echo $HOME/Downloads/_

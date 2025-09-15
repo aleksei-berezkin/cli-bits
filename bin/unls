@@ -1,0 +1,17 @@
+#!/usr/bin/env node
+
+/*
+ * Interprets the input as `ls -al` output and only outputs the file names
+ * Example: `ls -al | unls`
+ */
+
+import { readInputLines } from '../util/readInputLines.mjs'
+
+readInputLines().forEach(line => console.log(unlsLine(line)))
+
+function unlsLine(line) {
+// -rw-r--r--@  1 user.name  staff     91881 Dec 23 11:33 log1734938166928
+// -rw-r--r--@  1 user.name  staff     91881 Dec 23 2023  log1734938166928
+    const m = /[-\w@]+\s+\d+\s+[\w.-]+\s+[\w.]+\s+\d+\s+\w+\s+\d+\s+\d+(:\d+)?\s+(.*)/.exec(line)
+    return m ? m[2] : line
+}

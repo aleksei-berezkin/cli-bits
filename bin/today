@@ -1,0 +1,22 @@
+#!/usr/bin/env node
+
+/*
+ * today [deltaDays]
+ * Outputs the current date (+/- deltaDays) in the format YYYY-MM-DD
+ * 
+ * Example: `today -2` outputs the date of the day before yesterday
+ */
+const deltaDays = process.argv[2] ? Number(process.argv[2]) : 0
+
+const now = new Date()
+
+now.setUTCMilliseconds(now.getUTCMilliseconds() + deltaDays * 24 * 60 * 60 * 1000)
+
+const year = now.getFullYear()
+const month = now.getMonth() + 1
+const date = now.getDate()
+
+const monthStr = month < 10 ? `0${month}` : month
+const dateStr = date < 10 ? `0${date}` : date
+
+console.log(`${year}-${monthStr}-${dateStr}`)

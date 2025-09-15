@@ -1,0 +1,32 @@
+#!/usr/bin/env node
+
+/*
+ * getLine index [endIndex]
+ * 
+ * Outputs a selected line or a range of lines from the input stream.
+ * Indices are one-based; endIndex is inclusive.
+ * Negative indices are -1-based and count from the last line.
+ * 
+ * Example: `ls -a | getLine 1 2` outputs `.` and `..`
+ */
+
+import { readInputLines } from '../util/readInputLines.mjs'
+
+const lines = readInputLines()
+
+const lineIndex = Number(process.argv[2])
+const endIndex = process.argv[3] ? Number(process.argv[3]) : undefined
+
+if (lineIndex === 0) {
+  console.error('Index is 1-based')
+  process.exit(1)
+}
+
+// Positive indices: 1-based, inclusively
+const selectedLines = endIndex == null ? (
+  lineIndex > 0 ? [lines.at(lineIndex - 1)] : [lines.at(lineIndex)]
+) : (
+  lineIndex > 0 ? lines.slice(lineIndex - 1, endIndex) : lines.slice(lineIndex, endIndex === 0 ? undefined : endIndex)
+)
+
+selectedLines.forEach(c => console.log(c))

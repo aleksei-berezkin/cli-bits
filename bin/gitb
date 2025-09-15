@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+# Outputs the current git branch
+
+git symbolic-ref --short HEAD

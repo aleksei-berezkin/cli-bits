@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+# Output files named "*threadDump*.txt" recursively
+
+ls | grep threadDump | xargs find | grep ".txt"

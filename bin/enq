@@ -1,0 +1,15 @@
+#!/usr/bin/env node
+
+/*
+ * Enquotes lines from the input stream which contain spaces
+ * Example: `ls -al | enq`
+ */
+
+import { readInputLines } from '../util/readInputLines.mjs'
+
+readInputLines()
+  .forEach(line => console.log(enquote(line)))
+
+function enquote(line) {
+  return !line.startsWith('"') && !line.startsWith("'") && line.includes(' ') ? `"${line}"` : line
+}

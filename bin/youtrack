@@ -1,0 +1,22 @@
+#!/usr/bin/env node
+
+/*
+ * Opens a YouTrack issue provided via stdin in a browser
+ * Examples:
+ * `echo 'ABC-123' | youtrack`
+ * `gitb | youtrack`
+ */
+
+import { readFileSync } from 'fs'
+import { execSync } from 'child_process'
+import { exit } from 'process'
+
+const input = readFileSync(0, 'utf-8')
+const m = input.match(/\b[A-Za-z]+-\d+/g)
+
+if (m && m[0]) {
+  execSync(`open https://youtrack.jetbrains.com/issue/${m[0]}`)
+} else {
+  console.error(`No issue found in '${input}'`)
+  exit(1)
+}

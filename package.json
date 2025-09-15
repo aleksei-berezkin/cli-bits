@@ -1,0 +1,11 @@
+{
+  "name": "cli-bits",
+  "version": "1.0.0",
+  "scripts": {
+    "test": "node test/test.mjs"
+  },
+  "repository": "https://github.com/aleksei-berezkin/cli-bits",
+  "author": "Aleksei Berezkin",
+  "license": "ISC",
+  "description": "A collection of scripts for everyday use"
+}
