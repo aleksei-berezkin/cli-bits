@@ -6,6 +6,7 @@
  * Outputs a selected line or a range of lines from the input stream.
  * Indices are one-based; endIndex is inclusive.
  * Negative indices are -1-based and count from the last line.
+ * Trailing newlines are dropped.
  * 
  * Example: `ls -a | getLine 1 2` outputs `.` and `..`
  */
