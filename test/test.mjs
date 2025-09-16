@@ -30,25 +30,42 @@ test('enum long', () => {
 })
 
 test('getLine first', () => {
-  assert.equal(
-    exec('getLine 1', 'a\nb\nc'),
-    'a\n'
-  )
+  const input = 'a\nb\nc'
+  const output = 'a\n'
+  assert.equal(exec('getLine 1', input), output)
+  assert.equal(exec('getLine 1 1', input), output)
 })
 
 test('getLine last', () => {
-  assert.equal(
-    exec('getLine -1', 'a\nb\nc\n\n\n'),
-    'c\n'
-  )
+  const input = 'a\nb\nc\n\n\n'
+  const output = 'c\n'
+  assert.equal(exec('getLine 3', input), output)
+  assert.equal(exec('getLine 3 3', input), output)
+  assert.equal(exec('getLine -1', input), output)
+  assert.equal(exec('getLine -1 -1', input), output)
 })
 
-test('getLine range', () => {
-  // TODO fix
-  // assert.equal(
-  //   exec('getLine 2 -1', 'a\nb\nc\nd'),
-  //   'b\nc\nd\n'
-  // )
+test('getLine range 1', () => {
+  const input = 'a\nb\nc\nd'
+  const output = 'a\nb\n'
+  assert.equal(exec('getLine 1 2', input), output)
+  assert.equal(exec('getLine 1 -3', input), output)
+  assert.equal(exec('getLine -4 2', input), output)
+  assert.equal(exec('getLine -4 -3', input), output)
+})
+
+test('getLine range 2', () => {
+  const input = 'a\nb\nc\nd'
+  const output = 'b\nc\nd\n'
+  assert.equal(exec('getLine 2 4', input), output)
+  assert.equal(exec('getLine 2 -1', input), output)
+  assert.equal(exec('getLine -3 4', input), output)
+  assert.equal(exec('getLine -3 -1', input), output)
+})
+
+test('gitb', () => {
+  const stdout = exec('gitb')
+  assert(/^[a-zA-Z0-9._/-]+\n$/.test(stdout), `gitb output: ${stdout}`)
 })
 
 // *** Util ***
