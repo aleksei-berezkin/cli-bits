@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+# Outputs dumps containing `typescript` case-insensitive
+listDumps | xargs grep -In 'typescript' | less -SIm
