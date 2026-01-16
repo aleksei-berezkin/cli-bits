@@ -1,0 +1,29 @@
+#!/usr/bin/env node
+
+import fs from 'node:fs'
+
+const fileName = process.argv[2]
+if (!fileName) throw new Error('File not specified')
+
+const content = String(fs.readFileSync(fileName))
+for (const line of content.split('\n')) {
+  // 2026-01-14 13:05:27.956 IN
+  const m = /^\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d\.\d\d\d (\w+)\s+/.exec(line)
+  if (!m) {
+    console.log(line)
+    continue
+  }
+
+  const jsonRawStr = line.slice(m[0].length)
+  const jsonObj = JSON.parse(jsonRawStr)
+  const jsonFmtStr = JSON.stringify(jsonObj, null, 2)
+  for (const jsonLine of jsonFmtStr.split('\n')) {
+    const [contentFirstLine, ...contentLinesTail] = jsonLine.split('\\n')
+    console.log(`${m[0]}${contentFirstLine}`)
+
+    const contentIndent = /^\s*/.exec(contentFirstLine)
+    for (const contentLine of contentLinesTail) {
+      console.log(`${m[0]}${contentIndent}  ${contentLine.replaceAll('\\t', '  ')}`)
+    }
+  }
+}
