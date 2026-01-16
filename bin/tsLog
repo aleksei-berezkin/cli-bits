@@ -1,5 +1,14 @@
 #!/usr/bin/env node
 
+/*
+ * Outputs TypeScript-Go WebStorm-format logs in a readable way.
+ *
+ * Usage:
+ *
+ * cd webstorm-logs-20260114-130539/language-services
+ * tsLog TypeScript-Go-20260114-130448-667.log | less
+ */
+
 import fs from 'node:fs'
 
 const fileName = process.argv[2]
@@ -15,7 +24,12 @@ for (const line of content.split('\n')) {
   }
 
   const jsonRawStr = line.slice(m[0].length)
-  const jsonObj = JSON.parse(jsonRawStr)
+  const jsonObj = parseJsonSafe(jsonRawStr)
+  if (!jsonObj) {
+    console.log(line)
+    continue
+  }
+
   const jsonFmtStr = JSON.stringify(jsonObj, null, 2)
   for (const jsonLine of jsonFmtStr.split('\n')) {
     const [contentFirstLine, ...contentLinesTail] = jsonLine.split('\\n')
@@ -25,5 +39,12 @@ for (const line of content.split('\n')) {
     for (const contentLine of contentLinesTail) {
       console.log(`${m[0]}${contentIndent}  ${contentLine.replaceAll('\\t', '  ')}`)
     }
+  }
+}
+
+function parseJsonSafe(str) {
+  try {
+    return JSON.parse(str)
+  } catch (e) {
   }
 }
