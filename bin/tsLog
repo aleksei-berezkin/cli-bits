@@ -102,7 +102,8 @@ function highlightJsonLine(line) {
   const m = line.match(/^(\s*)("[^"]+")(\s*:\s*)(.+)$/)
   if (m) {
     const [, indent, key, punctuation, valueAndComma] = m
-    return `${indent}${highlight(key, 'key')}${punctuation}${highlightJsonValueAndComma(valueAndComma)}`
+    const isFlags = key.toLowerCase().includes('flags')
+    return `${indent}${highlight(key, 'key')}${punctuation}${highlightJsonValueAndComma(valueAndComma, isFlags)}`
   }
 
   // value,
@@ -115,11 +116,11 @@ function highlightJsonLine(line) {
   return line
 }
 
-function highlightJsonValueAndComma(valueAndComma) {
-  let kind
+function highlightJsonValueAndComma(valueAndComma, isFlags) {
   const value = valueAndComma.endsWith(',') ? valueAndComma.slice(0, -1) : valueAndComma
   const comma = valueAndComma.endsWith(',') ? ',' : ''
-
+  
+  let kind
   if (/^"/.test(value)) {
     kind = 'string'
   } else if (/^(true|false)$/.test(value)) {
@@ -130,13 +131,27 @@ function highlightJsonValueAndComma(valueAndComma) {
     kind = 'number'
   }
 
-  return `${highlight(value, kind)}${comma}`
+  const valueFormatted = isFlags && kind === 'number' ? formatAsFlags(value) : value
+  return `${highlight(valueFormatted, kind)}${comma}`
 }
 
 function highlight(input, kind) {
   const setFmt = kind ? COLORS[theme][kind] : '';
   const resetFmt = kind ? RESET : '';
   return `${setFmt}${input}${resetFmt}`;
+}
+
+function formatAsFlags(numStr) {
+  const num = parseInt(numStr, 10)
+  const bitsHint = []
+  for (let shl = 31; shl >= 0; shl--) {
+    const bit = 1 << shl
+    if ((num & bit) !== 0)
+      bitsHint.push(`1<<${shl}`)
+  }
+  if (bitsHint.length)
+    return `${numStr} (${bitsHint.join(' | ')})`
+  return numStr
 }
 
 function parseJsonSafe(str) {
