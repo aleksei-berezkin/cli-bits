@@ -6,7 +6,7 @@
  * Usage:
  *
  * cd webstorm-logs-20260114-130539/language-services
- * tsLog TypeScript-Go-20260114-130448-667.log | less
+ * tsLog TypeScript-Go-20260114-130448-667.log | less -R
  */
 
 import fs from 'node:fs'
@@ -86,7 +86,10 @@ function getTheme() {
   try {
       const result = child_process.execSync(
         'defaults read -g AppleInterfaceStyle',
-        { encoding: 'utf8' }
+        {
+          encoding: 'utf8',
+          stdio: ['ignore', 'pipe', 'ignore'],
+        },
       )
     return result.trim() === 'Dark' ? 'dark' : 'light'
   } catch {
