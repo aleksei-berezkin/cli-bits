@@ -144,7 +144,7 @@ function highlight(input, kind) {
 function formatAsFlags(numStr) {
   const num = parseInt(numStr, 10)
   const bitsHint = []
-  for (let shl = 31; shl >= 0; shl--) {
+  for (let shl = 0; shl < 32; shl++) {
     const bit = 1 << shl
     if ((num & bit) !== 0)
       bitsHint.push(`1<<${shl}`)
