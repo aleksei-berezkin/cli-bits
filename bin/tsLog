@@ -10,9 +10,35 @@
  */
 
 import fs from 'node:fs'
+import child_process from 'node:child_process'
+
 
 const fileName = process.argv[2]
 if (!fileName) throw new Error('File not specified')
+
+const theme = getTheme()
+
+// https://jakob-bagterp.github.io/colorist-for-python/ansi-escape-codes/extended-256-colors/#extended-palette
+const COLORS = {
+  light: {
+    prefix: '\x1b[38;5;243m',
+    key: '\x1b[38;5;125m',
+    string: '\x1b[38;5;28m',
+    number: '\x1b[38;5;21m',
+    boolean: '\x1b[38;5;18m',
+    null: '\x1b[38;5;241m',
+  },
+  dark: {
+    prefix: '\x1b[38;5;250m',
+    key: '\x1b[38;5;219m',
+    string: '\x1b[38;5;46m',
+    number: '\x1b[38;5;45m',
+    boolean: '\x1b[38;5;214m',
+    null: '\x1b[38;5;252m',
+  }
+};
+
+const RESET = '\x1b[0m';
 
 for (const line of String(fs.readFileSync(fileName)).split('\n')) {
   if (!line)
@@ -26,25 +52,88 @@ for (const line of String(fs.readFileSync(fileName)).split('\n')) {
   }
   const [prefix] = m
 
-  const jsonRawStr = line.slice(m[0].length)
+  const jsonRawStr = line.slice(prefix.length)
   const jsonObj = parseJsonSafe(jsonRawStr)
   if (!jsonObj) {
     console.log(line)
     continue
   }
 
+  const highlightedPrefix = highlight(prefix, 'prefix')
   const jsonFmtStr = JSON.stringify(jsonObj, null, 2)
   for (const jsonLine of jsonFmtStr.split('\n')) {
-    const [contentFirstLine, ...contentLinesTail] = jsonLine.split('\\n')
-    console.log(`${prefix}${contentFirstLine}`)
+    const [contentFirstLine, ...stringLines] = jsonLine.split('\\n')
+    const highlightedContentFirstLine = highlightJsonLine(contentFirstLine)
 
-    const contentIndent = /^\s*/.exec(contentFirstLine)
-    for (const contentLine of contentLinesTail) {
-      console.log(`${prefix}${contentIndent}  ${contentLine.replaceAll('\\t', '  ')}`)
+    console.log(`${highlightedPrefix}${highlightedContentFirstLine}`)
+
+    const contentIndent = /^\s*/.exec(contentFirstLine)[0] ?? ''
+    for (const contentLine of stringLines) {
+      const highlightedContentLine = highlight(contentLine.replaceAll('\\t', '  '), 'string')
+      console.log(`${highlightedPrefix}${contentIndent}  ${highlightedContentLine}`)
     }
   }
 
   console.log()
+}
+
+// *** Util ***
+
+function getTheme() {
+  if (process.platform !== 'darwin')
+    return 'light'
+
+  try {
+      const result = child_process.execSync(
+        'defaults read -g AppleInterfaceStyle',
+        { encoding: 'utf8' }
+      )
+    return result.trim() === 'Dark' ? 'dark' : 'light'
+  } catch {
+    return 'light'
+  }
+}
+
+function highlightJsonLine(line) {
+  // "key": value,
+  const m = line.match(/^(\s*)("[^"]+")(\s*:\s*)(.+)$/)
+  if (m) {
+    const [, indent, key, punctuation, valueAndComma] = m
+    return `${indent}${highlight(key, 'key')}${punctuation}${highlightJsonValueAndComma(valueAndComma)}`
+  }
+
+  // value,
+  const mm = line.match(/^(\s*)(.+)$/)
+  if (mm) {
+    const [, indent, valueAndComma] = mm
+    return `${indent}${highlightJsonValueAndComma(valueAndComma)}`
+  }
+
+  return line
+}
+
+function highlightJsonValueAndComma(valueAndComma) {
+  let kind
+  const value = valueAndComma.endsWith(',') ? valueAndComma.slice(0, -1) : valueAndComma
+  const comma = valueAndComma.endsWith(',') ? ',' : ''
+
+  if (/^"/.test(value)) {
+    kind = 'string'
+  } else if (/^(true|false)$/.test(value)) {
+    kind = 'boolean'
+  } else if (/^null$/.test(value)) {
+    kind = 'null'
+  } else if (/^-?\d/.test(value)) {
+    kind = 'number'
+  }
+
+  return `${highlight(value, kind)}${comma}`
+}
+
+function highlight(input, kind) {
+  const setFmt = kind ? COLORS[theme][kind] : '';
+  const resetFmt = kind ? RESET : '';
+  return `${setFmt}${input}${resetFmt}`;
 }
 
 function parseJsonSafe(str) {
